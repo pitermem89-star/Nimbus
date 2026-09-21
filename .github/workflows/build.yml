@@ -1,0 +1,42 @@
+name: Build Nimbus
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install Android tools
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
+
+      - name: Patch app
+        env:
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
+        run: |
+          sed -i '/com.google.gms.google-services/d' TMessagesProj_App/build.gradle
+          sed -i 's/abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"/abiFilters "arm64-v8a"/' TMessagesProj_App/build.gradle
+          if [ -n "$TG_API_ID" ] && [ -n "$TG_API_HASH" ]; then
+            sed -i "s/APP_ID = [0-9]*;/APP_ID = $TG_API_ID;/" TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
+            sed -i "s/APP_HASH = \"[0-9a-f]*\";/APP_HASH = \"$TG_API_HASH\";/" TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
+          fi
+
+      - name: Build
+        run: |
+          chmod +x gradlew
+          ./gradlew :TMessagesProj_App:assembleAfatDebug -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxMetaspaceSize=1g" --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nimbus-apk
+          path: "**/outputs/apk/**/*.apk"
