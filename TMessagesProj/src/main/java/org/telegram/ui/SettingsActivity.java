@@ -622,6 +622,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         }
 
         items.add(UItem.asCustomShadow(topView, 200 - 12));
+        items.add(SettingCell.Factory.of(100, IconBackgroundColors.ORANGE_DEEP.top, IconBackgroundColors.ORANGE_DEEP.bottom, R.drawable.settings_power, "Настройки Nimbus", "Оформление и функции клиента"));
 
         accountNumbers.clear();
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
@@ -835,6 +836,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 break;
             case 10:
                 presentSettingFragment(new LanguageSelectActivity());
+                break;
+            case 100:
+                presentSettingFragment(new NimbusSettingsActivity());
                 break;
 
             case 11:
