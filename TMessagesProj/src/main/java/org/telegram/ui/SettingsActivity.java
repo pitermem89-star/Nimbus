@@ -840,7 +840,6 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             case 100:
                 presentSettingFragment(new NimbusSettingsActivity());
                 break;
-
             case 11:
                 presentSettingFragment(new PremiumPreviewFragment("settings"));
                 break;
