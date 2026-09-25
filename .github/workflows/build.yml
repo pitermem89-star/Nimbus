@@ -9,7 +9,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
+          fetch-depth: 1
+
+      - name: Fetch submodules (retry on network errors)
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 5
+          retry_wait_seconds: 20
+          command: |
+            git submodule sync --recursive
+            git submodule update --init --force --depth=1 --recursive
 
       - uses: actions/setup-java@v4
         with:
