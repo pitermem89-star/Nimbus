@@ -353,11 +353,6 @@ public class ApplicationLoader extends Application {
 
         LauncherIconController.tryFixLauncherIconIfNeeded();
         ProxyRotationController.init();
-        try {
-            org.telegram.plugins.NimbusPluginManager.loadAllPlugins(applicationContext);
-        } catch (Throwable e) {
-            FileLog.e(e);
-        }
     }
 
     public static void startPushService() {
