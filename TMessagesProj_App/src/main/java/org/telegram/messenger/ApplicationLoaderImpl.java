@@ -7,4 +7,14 @@ public class ApplicationLoaderImpl extends ApplicationLoader {
     protected String onGetApplicationId() {
         return BuildConfig.APPLICATION_ID;
     }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        try {
+            org.telegram.plugins.NimbusPluginManager.loadAllPlugins(applicationContext);
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
 }
